@@ -360,6 +360,51 @@ function renderResult(markdown, query, level) {
   `;
 }
 
+const MAX_HISTORY = 20;
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+  } catch { return []; }
+}
+
+function addToHistory(query, level, markdown) {
+  const history = getHistory();
+  history.unshift({ query, level, markdown, timestamp: Date.now() });
+  if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+  localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const history = getHistory();
+  if (!history.length) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">No explanations yet.</div>';
+    return;
+  }
+  list.innerHTML = history.map((item, i) => `
+    <div class="history-item" data-index="${i}">
+      <div class="query">${escapeHtml(truncate(item.query, 60))}</div>
+      <div class="meta">${item.level} · ${new Date(item.timestamp).toLocaleDateString()}</div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.history-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.index);
+      const item = getHistory()[idx];
+      if (item) {
+        renderResult(item.markdown, item.query, item.level);
+      }
+    });
+  });
+}
+
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n) + '...' : str;
+}
+
 const explainBtn = document.getElementById('explainBtn');
 const conceptInput = document.getElementById('conceptInput');
 const levelSelect = document.getElementById('levelSelect');
@@ -377,6 +422,7 @@ explainBtn.addEventListener('click', async () => {
   try {
     const markdown = await explainConcept(concept, level);
     renderResult(markdown, concept, level);
+    addToHistory(concept, level, markdown);
   } catch (err) {
     resultArea.innerHTML = `<div class="error-box">${escapeHtml(err.message)}</div>`;
   } finally {
@@ -384,6 +430,17 @@ explainBtn.addEventListener('click', async () => {
     explainBtn.textContent = 'Explain';
   }
 });
+
+const historyToggle = document.getElementById('historyToggle');
+const historyPanel = document.getElementById('historyPanel');
+const historyClose = document.getElementById('historyClose');
+
+historyToggle.addEventListener('click', () => {
+  renderHistory();
+  historyPanel.classList.toggle('open');
+});
+
+historyClose.addEventListener('click', () => historyPanel.classList.remove('open'));
   </script>
 </body>
 </html>
