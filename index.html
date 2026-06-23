@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Explain Concept</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <link id="hljsTheme" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css" />
+  <link id="hljsThemeLight" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" disabled />
   <style>
     :root {
       --bg: #1a1a2e;
@@ -336,6 +339,9 @@ function setTheme(theme) {
   document.documentElement.className = theme === 'light' ? 'light' : '';
   localStorage.setItem(STORAGE_KEYS.THEME, theme);
   document.getElementById('themeToggle').textContent = theme === 'light' ? '☀️' : '🌙';
+  const isLight = theme === 'light';
+  document.getElementById('hljsTheme').disabled = isLight;
+  document.getElementById('hljsThemeLight').disabled = !isLight;
 }
 
 const themeToggle = document.getElementById('themeToggle');
@@ -509,6 +515,9 @@ function renderResult(markdown, query, level) {
     </div>
     <div class="result-section">${html}</div>
   `;
+  resultArea.querySelectorAll('pre code').forEach(block => {
+    hljs.highlightElement(block);
+  });
 }
 
 const MAX_HISTORY = 20;
