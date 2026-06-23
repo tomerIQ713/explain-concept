@@ -350,6 +350,16 @@ Match the depth to the experience level. Be accurate but never condescending.`;
   return data.choices[0].message.content;
 }
 
+function renderResult(markdown, query, level) {
+  const html = marked.parse(markdown, { breaks: true });
+  resultArea.innerHTML = `
+    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">
+      Level: ${level} · ${new Date().toLocaleTimeString()}
+    </div>
+    <div class="result-content">${html}</div>
+  `;
+}
+
 const explainBtn = document.getElementById('explainBtn');
 const conceptInput = document.getElementById('conceptInput');
 const levelSelect = document.getElementById('levelSelect');
@@ -366,8 +376,7 @@ explainBtn.addEventListener('click', async () => {
 
   try {
     const markdown = await explainConcept(concept, level);
-    resultArea.innerHTML = ''; // placeholder — full rendering in Task 4
-    console.log('Result:', markdown);
+    renderResult(markdown, concept, level);
   } catch (err) {
     resultArea.innerHTML = `<div class="error-box">${escapeHtml(err.message)}</div>`;
   } finally {
