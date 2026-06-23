@@ -261,7 +261,46 @@
   </div>
 
   <script>
-    // JS will be added in subsequent tasks
+const STORAGE_KEYS = {
+  API_KEY: 'explain_api_key',
+  MODEL: 'explain_model',
+  THEME: 'explain_theme',
+  HISTORY: 'explain_history',
+};
+
+function getSettings() {
+  return {
+    apiKey: localStorage.getItem(STORAGE_KEYS.API_KEY) || '',
+    model: localStorage.getItem(STORAGE_KEYS.MODEL) || 'deepseek/deepseek-v4-flash:free',
+  };
+}
+
+function saveSettings(apiKey, model) {
+  localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
+  localStorage.setItem(STORAGE_KEYS.MODEL, model);
+}
+
+const settingsToggle = document.getElementById('settingsToggle');
+const settingsModal = document.getElementById('settingsModal');
+const saveSettingsBtn = document.getElementById('saveSettings');
+const apiKeyInput = document.getElementById('apiKey');
+const modelSelect = document.getElementById('modelSelect');
+
+settingsToggle.addEventListener('click', () => {
+  const s = getSettings();
+  apiKeyInput.value = s.apiKey;
+  modelSelect.value = s.model;
+  settingsModal.classList.add('open');
+});
+
+settingsModal.addEventListener('click', (e) => {
+  if (e.target === settingsModal) settingsModal.classList.remove('open');
+});
+
+saveSettingsBtn.addEventListener('click', () => {
+  saveSettings(apiKeyInput.value.trim(), modelSelect.value);
+  settingsModal.classList.remove('open');
+});
   </script>
 </body>
 </html>
