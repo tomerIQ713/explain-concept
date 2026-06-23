@@ -162,6 +162,8 @@
     .modal h2 { margin-bottom: 16px; }
     .modal label { margin-top: 12px; }
     .modal .btn-primary { margin-top: 16px; width: 100%; }
+    .free-model-item:hover { background: var(--surface2); }
+    .free-model-item.selected { border-color: var(--accent); }
     .history-panel {
       position: fixed;
       top: 0; right: -320px;
@@ -251,8 +253,9 @@
       <input type="password" id="apiKey" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="sk-or-..." />
       <label for="modelSelect">Model</label>
       <input type="text" id="modelSelect" value="openrouter/free" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="e.g. openrouter/free" />
-      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;"><code>openrouter/free</code> auto-selects a working free model. Or try: qwen/qwen3-coder:free, meta-llama/llama-3.3-70b-instruct:free</div>
-      <button class="btn-primary" id="saveSettings">Save</button>
+      <button class="btn-primary" id="discoverModels" style="margin-top:8px;background:var(--surface2);font-size:0.85rem;">Search free models</button>
+      <div id="modelList" style="margin-top:8px;max-height:200px;overflow-y:auto;display:none;"></div>
+      <button class="btn-primary" id="saveSettings" style="margin-top:12px;">Save</button>
     </div>
   </div>
 
@@ -297,11 +300,14 @@ const settingsModal = document.getElementById('settingsModal');
 const saveSettingsBtn = document.getElementById('saveSettings');
 const apiKeyInput = document.getElementById('apiKey');
 const modelSelect = document.getElementById('modelSelect');
+const discoverBtn = document.getElementById('discoverModels');
+const modelListEl = document.getElementById('modelList');
 
 settingsToggle.addEventListener('click', () => {
   const s = getSettings();
   apiKeyInput.value = s.apiKey;
   modelSelect.value = s.model;
+  modelListEl.style.display = 'none';
   settingsModal.classList.add('open');
 });
 
@@ -313,6 +319,55 @@ saveSettingsBtn.addEventListener('click', () => {
   saveSettings(apiKeyInput.value.trim(), modelSelect.value);
   renderModelBadge();
   settingsModal.classList.remove('open');
+});
+
+discoverBtn.addEventListener('click', async () => {
+  if (!apiKeyInput.value.trim()) {
+    modelListEl.style.display = 'block';
+    modelListEl.innerHTML = '<div style="color:var(--error);font-size:0.85rem;">Enter your API key first.</div>';
+    return;
+  }
+  saveSettings(apiKeyInput.value.trim(), modelSelect.value);
+  discoverBtn.disabled = true;
+  discoverBtn.textContent = 'Searching...';
+  modelListEl.style.display = 'block';
+  modelListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Loading...</div>';
+  try {
+    const models = await fetchFreeModels();
+    if (!models.length) {
+      modelListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">No free models found.</div>';
+      return;
+    }
+    modelListEl.innerHTML = models.map(m => `
+      <div class="free-model-item" data-model="${escapeHtml(m.id)}" style="padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:pointer;font-size:0.85rem;display:flex;justify-content:space-between;align-items:center;">
+        <span><strong>${escapeHtml(m.name)}</strong><br><span style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(m.id)}</span></span>
+        <span style="color:var(--text-muted);font-size:0.75rem;">${escapeHtml(m.context)} ctx</span>
+      </div>
+    `).join('');
+    modelListEl.querySelectorAll('.free-model-item').forEach(el => {
+      el.addEventListener('click', async () => {
+        const modelId = el.dataset.model;
+        modelSelect.value = modelId;
+        saveSettings(apiKeyInput.value.trim(), modelId);
+        modelListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Testing model... one sec.</div>';
+        try {
+          const res = await explainConcept('what is 2+2', 'Beginner');
+          if (res && res.length > 10) {
+            modelListEl.innerHTML = `<div style="color:var(--success);font-size:0.85rem;">Model works! Saved.</div>`;
+            renderModelBadge();
+          }
+        } catch {
+          modelListEl.innerHTML = `<div style="color:var(--error);font-size:0.85rem;">Model failed. Try another.</div>`;
+          modelSelect.value = getSettings().model;
+        }
+      });
+    });
+  } catch (err) {
+    modelListEl.innerHTML = `<div style="color:var(--error);font-size:0.85rem;">${escapeHtml(err.message)}</div>`;
+  } finally {
+    discoverBtn.disabled = false;
+    discoverBtn.textContent = 'Search free models';
+  }
 });
 
 function renderModelBadge() {
@@ -344,9 +399,9 @@ Match the depth to the experience level. Be accurate but never condescending.`;
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      'Authorization': `Bearer ${apiKey.trim()}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': window.location.origin,
+      'HTTP-Referer': 'https://explain-concept-local',
     },
     body: JSON.stringify({
       model,
@@ -367,6 +422,34 @@ Match the depth to the experience level. Be accurate but never condescending.`;
 
   const data = await res.json();
   return data.choices[0].message.content;
+}
+
+async function fetchFreeModels() {
+  const { apiKey } = getSettings();
+  if (!apiKey) throw new Error('Add your API key in Settings first.');
+
+  const res = await fetch('https://openrouter.ai/api/v1/models', {
+    headers: {
+      'Authorization': `Bearer ${apiKey.trim()}`,
+      'HTTP-Referer': 'https://explain-concept-local',
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to fetch models');
+  }
+
+  const data = await res.json();
+  const freeModels = (data.data || []).filter(m =>
+    m.id.endsWith(':free') || m.pricing?.prompt === 0
+  );
+
+  return freeModels.map(m => ({
+    id: m.id,
+    name: m.name || m.id,
+    context: m.context_length || '?',
+  }));
 }
 
 function renderResult(markdown, query, level) {
