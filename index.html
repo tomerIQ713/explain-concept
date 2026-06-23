@@ -233,7 +233,7 @@
       <textarea id="conceptInput" placeholder="Paste a confusing function, unfamiliar syntax, or just describe what you don't understand..."></textarea>
     </div>
 
-    <button class="btn-primary" id="explainBtn">Explain</button>
+    <button class="btn-primary" id="explainBtn" disabled>Explain</button>
 
     <div id="resultArea" style="margin-top: 24px;"></div>
   </div>
@@ -250,12 +250,7 @@
       <label for="apiKey">OpenRouter API Key</label>
       <input type="password" id="apiKey" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="sk-or-..." />
       <label for="modelSelect">Model</label>
-      <select id="modelSelect">
-        <option value="deepseek/deepseek-v4-flash:free">DeepSeek V4 Flash (free)</option>
-        <option value="qwen/qwen3-coder:free">Qwen3 Coder (free)</option>
-        <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (free)</option>
-        <option value="openrouter/free">OpenRouter Free Router</option>
-      </select>
+      <input type="text" id="modelSelect" value="deepseek/deepseek-v4-flash:free" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="e.g. deepseek/deepseek-v4-flash:free" />
       <button class="btn-primary" id="saveSettings">Save</button>
     </div>
   </div>
@@ -321,7 +316,7 @@ saveSettingsBtn.addEventListener('click', () => {
 
 function renderModelBadge() {
   const { model } = getSettings();
-  const modelLabel = document.getElementById('modelSelect').selectedOptions?.[0]?.text || model;
+  const modelLabel = model;
   document.getElementById('modelBadge').textContent = `Model: ${modelLabel}`;
 }
 
@@ -366,7 +361,7 @@ Match the depth to the experience level. Be accurate but never condescending.`;
     const err = await res.json().catch(() => ({}));
     const msg = err.error?.message || res.statusText;
     if (res.status === 429) throw new Error('Rate limited. Wait a moment and retry.');
-    throw new Error(`API error (${res.status}): ${msg}`);
+    throw new Error(`API error (${res.status}): ${msg} — check your API key and model selection`);
   }
 
   const data = await res.json();
@@ -379,7 +374,7 @@ function renderResult(markdown, query, level) {
     <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">
       Level: ${level} · ${new Date().toLocaleTimeString()}
     </div>
-    <div class="result-content">${html}</div>
+    <div class="result-section">${html}</div>
   `;
 }
 
@@ -433,6 +428,16 @@ const conceptInput = document.getElementById('conceptInput');
 const levelSelect = document.getElementById('levelSelect');
 const resultArea = document.getElementById('resultArea');
 
+conceptInput.addEventListener('input', () => {
+  explainBtn.disabled = conceptInput.value.trim().length === 0;
+});
+
+conceptInput.addEventListener('input', () => {
+  conceptInput.style.height = 'auto';
+  conceptInput.style.height = conceptInput.scrollHeight + 'px';
+});
+conceptInput.style.height = conceptInput.scrollHeight + 'px';
+
 explainBtn.addEventListener('click', async () => {
   const concept = conceptInput.value.trim();
   if (!concept) return;
@@ -447,7 +452,13 @@ explainBtn.addEventListener('click', async () => {
     renderResult(markdown, concept, level);
     addToHistory(concept, level, markdown);
   } catch (err) {
-    resultArea.innerHTML = `<div class="error-box">${escapeHtml(err.message)}</div>`;
+    const msg = err instanceof TypeError
+      ? 'Check your internet connection'
+      : err.message;
+    resultArea.innerHTML = `<div class="error-box">${escapeHtml(msg)}</div>`;
+    if (err.message && err.message.includes('No API key')) {
+      settingsModal.classList.add('open');
+    }
   } finally {
     explainBtn.disabled = false;
     explainBtn.textContent = 'Explain';
