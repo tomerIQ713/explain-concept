@@ -280,6 +280,22 @@ function saveSettings(apiKey, model) {
   localStorage.setItem(STORAGE_KEYS.MODEL, model);
 }
 
+function getTheme() {
+  return localStorage.getItem(STORAGE_KEYS.THEME) || 'dark';
+}
+
+function setTheme(theme) {
+  document.documentElement.className = theme === 'light' ? 'light' : '';
+  localStorage.setItem(STORAGE_KEYS.THEME, theme);
+  document.getElementById('themeToggle').textContent = theme === 'light' ? '☀️' : '🌙';
+}
+
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  const current = getTheme();
+  setTheme(current === 'light' ? 'dark' : 'light');
+});
+
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsModal = document.getElementById('settingsModal');
 const saveSettingsBtn = document.getElementById('saveSettings');
@@ -299,8 +315,15 @@ settingsModal.addEventListener('click', (e) => {
 
 saveSettingsBtn.addEventListener('click', () => {
   saveSettings(apiKeyInput.value.trim(), modelSelect.value);
+  renderModelBadge();
   settingsModal.classList.remove('open');
 });
+
+function renderModelBadge() {
+  const { model } = getSettings();
+  const modelLabel = document.getElementById('modelSelect').selectedOptions?.[0]?.text || model;
+  document.getElementById('modelBadge').textContent = `Model: ${modelLabel}`;
+}
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -441,6 +464,10 @@ historyToggle.addEventListener('click', () => {
 });
 
 historyClose.addEventListener('click', () => historyPanel.classList.remove('open'));
+
+setTheme(getTheme());
+renderHistory();
+renderModelBadge();
   </script>
 </body>
 </html>
