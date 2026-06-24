@@ -263,7 +263,7 @@
       </div>
     </header>
 
-    <div class="model-badge" id="modelBadge">Model: openrouter/free</div>
+    <div class="model-badge" id="modelBadge">Model: meta-llama/llama-3.3-70b-instruct:free</div>
 
     <div class="form-group">
       <label for="levelSelect">Experience Level</label>
@@ -296,7 +296,7 @@
       <label for="apiKey">OpenRouter API Key</label>
       <input type="password" id="apiKey" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="sk-or-..." />
       <label for="modelSelect">Model</label>
-      <input type="text" id="modelSelect" value="openrouter/free" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="e.g. openrouter/free" />
+      <input type="text" id="modelSelect" value="meta-llama/llama-3.3-70b-instruct:free" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="e.g. meta-llama/llama-3.3-70b-instruct:free" />
       <button class="btn-primary" id="discoverModels" style="margin-top:8px;background:var(--surface2);font-size:0.85rem;">Search free models</button>
       <div id="modelList" style="margin-top:8px;max-height:200px;overflow-y:auto;display:none;"></div>
       <button class="btn-primary" id="saveSettings" style="margin-top:12px;">Save</button>
@@ -314,7 +314,7 @@ const STORAGE_KEYS = {
 function getSettings() {
   return {
     apiKey: localStorage.getItem(STORAGE_KEYS.API_KEY) || '',
-    model: localStorage.getItem(STORAGE_KEYS.MODEL) || 'openrouter/free',
+    model: localStorage.getItem(STORAGE_KEYS.MODEL) || 'meta-llama/llama-3.3-70b-instruct:free',
   };
 }
 
@@ -585,7 +585,7 @@ explainBtn.addEventListener('click', async () => {
   resultArea.innerHTML = '<div class="loading">Explaining...</div>';
 
   abortController = new AbortController();
-  const timeout = setTimeout(() => abortController.abort(), 45000);
+  const timeout = setTimeout(() => abortController.abort(), 25000);
 
   try {
     const markdown = await explainConcept(concept, level, abortController.signal);
@@ -595,7 +595,7 @@ explainBtn.addEventListener('click', async () => {
     console.error('Explain error:', err);
     let msg;
     if (err.name === 'AbortError') {
-      msg = 'Request timed out after 45s. The free model may be slow — try a different one or try again later.';
+      msg = 'Timed out (25s). The free model may be slow — use Search free models to find a faster one.';
     } else if (err instanceof TypeError) {
       msg = `Request failed — check your internet connection and that the model ID is valid. (${err.message})`;
     } else {
