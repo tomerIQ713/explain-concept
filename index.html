@@ -456,7 +456,7 @@ Match the depth to the experience level. Be accurate but never condescending.`;
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Explain this (${level} level):\n\n${concept}` },
       ],
-      temperature: 0.3,
+      temperature: 0.1,
     }),
     signal,
   });
@@ -470,6 +470,69 @@ Match the depth to the experience level. Be accurate but never condescending.`;
 
   const data = await res.json();
   return data.choices[0].message.content;
+}
+
+async function streamExplain(concept, level, onChunk, signal) {
+  const { apiKey, model } = getSettings();
+  if (!apiKey) throw new Error('No API key configured. Add one in Settings.');
+
+  const systemPrompt = `You are a patient tutor who explains concepts from scratch. Given the following concept/code and the learner's experience level (${level}), produce a structured explanation with exactly these 5 sections:
+
+1. **Plain English** — What it is in simple terms
+2. **How It Works** — The mechanics under the hood
+3. **Real-World Analogy** — A relatable metaphor
+4. **Code Example** — A clean, minimal example (if applicable)
+5. **Common Mistakes** — What beginners get wrong
+
+Match the depth to the experience level. Be accurate but never condescending.`;
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey.trim()}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://explain-concept-local',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Explain this (${level} level):\n\n${concept}` },
+      ],
+      temperature: 0.1,
+      stream: true,
+    }),
+    signal,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg = err.error?.message || res.statusText;
+    if (res.status === 429) throw new Error('Rate limited. Wait a moment and retry.');
+    throw new Error(`API error (${res.status}): ${msg} — check your API key and model selection`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop() || '';
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6);
+      if (data === '[DONE]') return;
+      try {
+        const parsed = JSON.parse(data);
+        const content = parsed.choices?.[0]?.delta?.content || '';
+        if (content) onChunk(content);
+      } catch {}
+    }
+  }
 }
 
 async function fetchFreeModels() {
@@ -588,9 +651,20 @@ explainBtn.addEventListener('click', async () => {
   const timeout = setTimeout(() => abortController.abort(), 25000);
 
   try {
-    const markdown = await explainConcept(concept, level, abortController.signal);
-    renderResult(markdown, concept, level);
-    addToHistory(concept, level, markdown);
+    let fullText = '';
+    const container = document.createElement('div');
+    container.className = 'result-section';
+    container.style.whiteSpace = 'pre-wrap';
+    resultArea.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Level: ${level}</div>`;
+    resultArea.appendChild(container);
+
+    await streamExplain(concept, level, chunk => {
+      fullText += chunk;
+      container.textContent = fullText;
+    }, abortController.signal);
+
+    renderResult(fullText, concept, level);
+    addToHistory(concept, level, fullText);
   } catch (err) {
     console.error('Explain error:', err);
     let msg;
