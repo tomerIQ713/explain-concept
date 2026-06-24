@@ -433,15 +433,17 @@ async function explainConcept(concept, level, signal) {
   const { apiKey, model } = getSettings();
   if (!apiKey) throw new Error('No API key configured. Add one in Settings.');
 
-  const systemPrompt = `You are a patient tutor who explains concepts from scratch. Given the following concept/code and the learner's experience level (${level}), produce a structured explanation with exactly these 5 sections:
+  const sys = `Explain concepts to a ${level} student. Always return exactly 5 sections: Plain English, How It Works, Real-World Analogy, Code Example, Common Mistakes. Be accurate.`;
 
-1. **Plain English** — What it is in simple terms
-2. **How It Works** — The mechanics under the hood
-3. **Real-World Analogy** — A relatable metaphor
-4. **Code Example** — A clean, minimal example (if applicable)
-5. **Common Mistakes** — What beginners get wrong
-
-Match the depth to the experience level. Be accurate but never condescending.`;
+  const body = {
+    model,
+    messages: [
+      { role: 'system', content: sys },
+      { role: 'user', content: `Explain this (${level}):\n\n${concept}` },
+    ],
+    temperature: 0.1,
+    max_tokens: 1200,
+  };
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -450,14 +452,7 @@ Match the depth to the experience level. Be accurate but never condescending.`;
       'Content-Type': 'application/json',
       'HTTP-Referer': 'https://explain-concept-local',
     },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Explain this (${level} level):\n\n${concept}` },
-      ],
-      temperature: 0.1,
-    }),
+    body: JSON.stringify(body),
     signal,
   });
 
@@ -476,15 +471,7 @@ async function streamExplain(concept, level, onChunk, signal) {
   const { apiKey, model } = getSettings();
   if (!apiKey) throw new Error('No API key configured. Add one in Settings.');
 
-  const systemPrompt = `You are a patient tutor who explains concepts from scratch. Given the following concept/code and the learner's experience level (${level}), produce a structured explanation with exactly these 5 sections:
-
-1. **Plain English** — What it is in simple terms
-2. **How It Works** — The mechanics under the hood
-3. **Real-World Analogy** — A relatable metaphor
-4. **Code Example** — A clean, minimal example (if applicable)
-5. **Common Mistakes** — What beginners get wrong
-
-Match the depth to the experience level. Be accurate but never condescending.`;
+  const sys = `Explain concepts to a ${level} student. Always return exactly 5 sections: Plain English, How It Works, Real-World Analogy, Code Example, Common Mistakes. Be accurate.`;
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -496,10 +483,11 @@ Match the depth to the experience level. Be accurate but never condescending.`;
     body: JSON.stringify({
       model,
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Explain this (${level} level):\n\n${concept}` },
+        { role: 'system', content: sys },
+        { role: 'user', content: `Explain this (${level}):\n\n${concept}` },
       ],
       temperature: 0.1,
+      max_tokens: 1200,
       stream: true,
     }),
     signal,
