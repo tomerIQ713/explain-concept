@@ -636,7 +636,7 @@ explainBtn.addEventListener('click', async () => {
   resultArea.innerHTML = '<div class="loading">Explaining...</div>';
 
   abortController = new AbortController();
-  const timeout = setTimeout(() => abortController.abort(), 25000);
+  const timeout = setTimeout(() => abortController.abort(), 50000);
 
   try {
     let fullText = '';
@@ -657,7 +657,7 @@ explainBtn.addEventListener('click', async () => {
     console.error('Explain error:', err);
     let msg;
     if (err.name === 'AbortError') {
-      msg = 'Timed out (25s). The free model may be slow — use Search free models to find a faster one.';
+      msg = 'Timed out (50s). The free model may be slow — use Search free models to find a faster one.';
     } else if (err instanceof TypeError) {
       msg = `Request failed — check your internet connection and that the model ID is valid. (${err.message})`;
     } else {
