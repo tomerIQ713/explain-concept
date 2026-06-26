@@ -3,696 +3,1290 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Explain Concept</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233B82F6'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'%3EE%3C/text%3E%3C/svg%3E" />
+  <title>Explain</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'%3E%3F%3C/text%3E%3C/svg%3E" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css" id="hljs-dark" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" id="hljs-light" disabled />
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-  <link id="hljsTheme" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css" />
-  <link id="hljsThemeLight" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" disabled />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'strict' });</script>
   <style>
     :root {
-      --bg: #0B0F14;
-      --surface: #121826;
-      --surface2: #1F2937;
-      --text: #E5E7EB;
-      --text-muted: #9CA3AF;
-      --accent: #3B82F6;
-      --border: #1F2937;
-      --error: #ef5350;
-      --success: #66bb6a;
+      --bg:         #0d1117;
+      --surface:    #161b22;
+      --surface2:   #21262d;
+      --surface3:   #30363d;
+      --text:       #e6edf3;
+      --text-2:     #8b949e;
+      --text-3:     #6e7681;
+      --accent:     #6366f1;
+      --accent-dim: #1e1f4a;
+      --accent-mid: #4f52c2;
+      --border:     #30363d;
+      --border-2:   #21262d;
+      --success:    #3fb950;
+      --warn:       #d29922;
+      --error:      #f85149;
+      --radius:     10px;
+      --radius-lg:  14px;
     }
     :root.light {
-      --bg: #F8FAFC;
-      --surface: #FFFFFF;
-      --surface2: #F1F5F9;
-      --text: #0F172A;
-      --text-muted: #64748B;
-      --accent: #3B82F6;
-      --border: #E2E8F0;
-      --error: #DC2626;
-      --success: #16A34A;
+      --bg:         #f6f8fa;
+      --surface:    #ffffff;
+      --surface2:   #f0f2f5;
+      --surface3:   #e4e7ec;
+      --text:       #1c2128;
+      --text-2:     #57606a;
+      --text-3:     #8c959f;
+      --accent:     #5856eb;
+      --accent-dim: #ededff;
+      --accent-mid: #4a49cc;
+      --border:     #d8dee4;
+      --border-2:   #eaeef2;
+      --success:    #1a7f37;
+      --warn:       #9a6700;
+      --error:      #cf222e;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      width: 100%;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    header h1 { font-size: 1.5rem; }
-    header .controls { display: flex; gap: 8px; }
-    .icon-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .icon-btn:hover { background: var(--surface2); }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; margin-bottom: 6px; font-size: 0.9rem; color: var(--text-muted); }
-    select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-    }
-    select:focus, textarea:focus { outline: none; border-color: var(--accent); }
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-      font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .result-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 12px;
-    }
-    .result-section h1,
-    .result-section h2,
-    .result-section h3,
-    .result-section h4 {
-      margin: 16px 0 8px 0;
-      color: var(--accent);
-      line-height: 1.3;
-    }
-    .result-section h1 { font-size: 1.3rem; }
-    .result-section h2 { font-size: 1.15rem; }
-    .result-section h3 { font-size: 1.05rem; }
-    .result-section h4 { font-size: 1rem; }
-    .result-section h1:first-child,
-    .result-section h2:first-child,
-    .result-section h3:first-child { margin-top: 0; }
-    .result-section p {
-      margin: 8px 0;
-      line-height: 1.7;
-    }
-    .result-section ul, .result-section ol {
-      margin: 8px 0;
-      padding-left: 24px;
-    }
-    .result-section li {
-      margin: 4px 0;
       line-height: 1.6;
     }
-    .result-section code {
-      background: var(--surface2);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.9em;
+
+    /* ── Layout ── */
+    .app { max-width: 720px; margin: 0 auto; padding: 24px 20px 80px; }
+
+    /* ── Header ── */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px;
     }
-    .result-section pre {
-      background: var(--surface2);
-      padding: 16px;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 12px 0;
-    }
-    .result-section pre code { background: none; padding: 0; }
-    .result-section blockquote {
-      border-left: 3px solid var(--accent);
-      padding: 8px 16px;
-      margin: 12px 0;
-      background: var(--surface2);
-      border-radius: 0 6px 6px 0;
-    }
-    .result-section hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 16px 0;
-    }
-    .result-section table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0;
-    }
-    .result-section th, .result-section td {
+    .wordmark { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+    .wordmark span { color: var(--accent); }
+    .top-actions { display: flex; gap: 6px; }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 8px;
       border: 1px solid var(--border);
-      padding: 8px 12px;
-      text-align: left;
+      background: var(--surface);
+      color: var(--text-2);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
     }
-    .result-section th {
-      background: var(--surface2);
-      font-weight: 600;
+    .icon-btn:hover { background: var(--surface2); color: var(--text); }
+    .icon-btn svg { width: 15px; height: 15px; }
+
+    /* ── Input section ── */
+    .input-section { margin-bottom: 20px; }
+
+    .level-row {
+      display: flex; gap: 6px; margin-bottom: 12px;
     }
-    .result-section strong { font-weight: 600; }
-    .result-section em { font-style: italic; }
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
+    .level-btn {
+      flex: 1; padding: 7px 6px; font-size: 12.5px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-2);
+      border-radius: 8px; cursor: pointer;
+      transition: all 0.15s; text-align: center;
     }
-    .error-box {
-      background: var(--error);
+    .level-btn:hover { background: var(--surface2); color: var(--text); }
+    .level-btn.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .preset-row {
+      display: flex; gap: 4px; margin-bottom: 10px;
+    }
+    .preset-btn {
+      flex: 0 1 auto; padding: 4px 10px; font-size: 11.5px;
+      border: 1px solid var(--border-2);
+      background: transparent;
+      color: var(--text-3);
+      border-radius: 16px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover { background: var(--surface2); color: var(--text-2); border-color: var(--border); }
+    .preset-btn.active {
+      background: var(--accent-dim);
+      border-color: var(--accent-mid);
+      color: var(--accent);
+    }
+    .preset-btn.active::before { content: '✓ '; }
+
+    .textarea-wrap { position: relative; }
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      padding: 14px 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    textarea:focus { outline: none; border-color: var(--accent); }
+    textarea::placeholder { font-family: -apple-system, sans-serif; color: var(--text-3); font-size: 13px; }
+
+    .submit-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+
+    .btn-explain {
+      flex: 1; padding: 10px 20px;
+      background: var(--accent);
       color: #fff;
-      padding: 12px 16px;
+      border: none; border-radius: var(--radius);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-explain:hover:not(:disabled) { opacity: 0.88; }
+    .btn-explain:active:not(:disabled) { transform: scale(0.98); }
+    .btn-explain:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-ghost {
+      padding: 10px 14px; font-size: 13px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-2);
+      border-radius: var(--radius); cursor: pointer;
+    }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+    .export-row {
+      display: flex; gap: 6px; margin-bottom: 10px; justify-content: flex-end;
+    }
+    .btn-export {
+      padding: 6px 12px; font-size: 11.5px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-2);
+      border-radius: 8px; cursor: pointer; display: none;
+      transition: all 0.15s;
+    }
+    .btn-export:hover { background: var(--surface2); color: var(--text); border-color: var(--accent-mid); }
+    .btn-export.show { display: inline-flex; align-items: center; gap: 5px; }
+
+    .model-label {
+      font-size: 11.5px; color: var(--text-3);
+      text-align: right; margin-top: 6px;
+    }
+
+    /* ── Loading ── */
+    .loading-wrap { padding: 32px 0; text-align: center; color: var(--text-2); font-size: 14px; }
+    .dots { display: inline-flex; gap: 5px; margin-top: 10px; }
+    .dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); opacity: 0.3;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes pulse { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+
+    /* ── Result cards ── */
+    .result-area { margin-top: 4px; }
+
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .section-head {
+      display: flex; align-items: center; gap: 9px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-2);
+      background: var(--surface2);
+    }
+    .section-icon { font-size: 15px; line-height: 1; }
+    .section-icon svg { width: 15px; height: 15px; display: block; }
+    .section-title { font-size: 12px; font-weight: 600; color: var(--text-2); letter-spacing: 0.04em; text-transform: uppercase; }
+    .status-bar { max-width:720px; margin:8px auto 0; padding:6px 12px; font-size:11px; color:var(--text-3); font-family:monospace; max-height:200px; overflow-y:auto; line-height:1.6; }
+
+    .section-body {
+      padding: 16px 18px;
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--text);
+    }
+    .section-body p { margin-bottom: 10px; }
+    .section-body p:last-child { margin-bottom: 0; }
+    .section-body ul, .section-body ol { padding-left: 20px; margin-bottom: 10px; }
+    .section-body li { margin-bottom: 5px; }
+    .section-body code {
+      font-family: 'SF Mono','Fira Code','Consolas',monospace;
+      font-size: 12.5px;
+      background: var(--surface2);
+      padding: 2px 6px; border-radius: 5px;
+    }
+    .section-body pre {
+      border-radius: var(--radius);
+      overflow-x: auto; margin: 10px 0;
+    }
+    .section-body pre code { background: none; padding: 0; font-size: 13px; }
+    .section-body strong { font-weight: 600; }
+    .section-body em { font-style: italic; color: var(--text-2); }
+
+    /* ── SVG diagram ── */
+    .diagram-wrap {
+      margin-top: 14px;
+      border-top: 1px solid var(--border-2);
+      padding-top: 14px;
+    }
+    .diagram-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+      color: var(--text-3); text-transform: uppercase; margin-bottom: 10px;
+    }
+    .diagram-wrap svg {
+      width: 100%; height: auto; display: block;
       border-radius: 8px;
-      margin: 12px 0;
     }
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
+    .diagram-skeleton {
+      height: 160px; border-radius: 8px;
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
     }
-    .modal-overlay.open { display: flex; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Follow-up ── */
+    .followup-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    .followup-head {
+      padding: 11px 16px;
+      font-size: 12px; font-weight: 600; color: var(--text-2);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      border-bottom: 1px solid var(--border-2);
+      background: var(--surface2);
+    }
+    .followup-body { padding: 14px 16px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .chip {
+      padding: 5px 11px; font-size: 12.5px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface2);
+      color: var(--text-2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    .fu-row { display: flex; gap: 8px; }
+    .fu-input {
+      flex: 1; padding: 9px 12px; font-size: 13.5px;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .fu-input:focus { outline: none; border-color: var(--accent); }
+    .fu-btn {
+      padding: 9px 14px; font-size: 13px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-2);
+      border-radius: var(--radius); cursor: pointer;
+    }
+    .fu-btn:hover:not(:disabled) { background: var(--surface3); color: var(--text); }
+    .fu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .fu-thread { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .fu-bubble {
+      padding: 12px 14px; border-radius: var(--radius);
+      font-size: 13.5px; line-height: 1.7;
+    }
+    .fu-bubble.question {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      align-self: flex-end; max-width: 90%;
+    }
+    .fu-bubble.answer {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+    }
+    .fu-bubble.thinking { color: var(--text-3); font-style: italic; }
+    .fu-bubble p { margin-bottom: 8px; }
+    .fu-bubble p:last-child { margin-bottom: 0; }
+    .fu-bubble code {
+      font-family: 'SF Mono','Fira Code','Consolas',monospace;
+      font-size: 12px; background: var(--surface3);
+      padding: 2px 5px; border-radius: 4px;
+    }
+    .fu-bubble pre { border-radius: 6px; overflow-x: auto; margin: 8px 0; }
+    .fu-bubble pre code { background: none; padding: 0; }
+
+    /* ── Error ── */
+    .error-box {
+      background: color-mix(in srgb, var(--error) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
+      color: var(--error);
+      border-radius: var(--radius);
+      padding: 12px 16px; font-size: 13.5px;
+      margin-top: 12px;
+    }
+
+    /* ── History panel ── */
+    .panel-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 80;
+    }
+    .panel-overlay.open { display: block; }
+    .history-panel {
+      position: fixed; top: 0; right: -340px; width: 320px; height: 100%;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      transition: right 0.25s ease; z-index: 90;
+      display: flex; flex-direction: column;
+    }
+    .history-panel.open { right: 0; }
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px; font-weight: 600;
+    }
+    .panel-close { background: none; border: none; color: var(--text-2); cursor: pointer; font-size: 18px; line-height: 1; }
+    .panel-btn { background: none; border: 1px solid var(--border); color: var(--text-2); cursor: pointer; font-size: 11px; padding: 2px 8px; border-radius: 6px; margin-right: 6px; }
+    .panel-btn:hover { background: var(--surface2); color: var(--error); border-color: var(--error); }
+    .panel-body { flex: 1; overflow-y: auto; padding: 12px; }
+    .h-item {
+      padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 8px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .h-item:hover { background: var(--surface2); }
+    .h-item-q { font-size: 13px; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .h-item-meta { font-size: 11.5px; color: var(--text-3); }
+    .h-empty { font-size: 13px; color: var(--text-3); padding: 8px 4px; }
+
+    /* ── Settings modal ── */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
     .modal {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      width: 90%;
-      max-width: 480px;
+      border-radius: var(--radius-lg);
+      padding: 24px; width: 90%; max-width: 460px;
     }
-    .modal h2 { margin-bottom: 16px; }
-    .modal label { margin-top: 12px; }
-    .modal .btn-primary { margin-top: 16px; width: 100%; }
+    .modal h2 { font-size: 16px; margin-bottom: 18px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: var(--text-2); margin-bottom: 5px; font-weight: 500; letter-spacing: 0.03em; }
+    .field input, .field select {
+      width: 100%; padding: 9px 12px;
+      background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 13.5px;
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+    .btn-save {
+      flex: 1; padding: 10px; font-size: 14px; font-weight: 600;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius); cursor: pointer;
+    }
+    .btn-save:hover { opacity: 0.88; }
+    .btn-cancel {
+      padding: 10px 16px; font-size: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text-2);
+      border-radius: var(--radius); cursor: pointer;
+    }
+    .btn-cancel:hover { background: var(--surface3); }
+    .free-models-wrap { margin-top: 8px; max-height: 180px; overflow-y: auto; display: none; }
+    .free-model-item {
+      padding: 8px 10px; border: 1px solid var(--border);
+      border-radius: 7px; margin-bottom: 5px; cursor: pointer;
+      font-size: 12.5px; display: flex; justify-content: space-between; align-items: center;
+    }
     .free-model-item:hover { background: var(--surface2); }
     .free-model-item.selected { border-color: var(--accent); }
-    .history-panel {
-      position: fixed;
-      top: 0; right: -320px;
-      width: 320px; height: 100%;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      transition: right 0.3s;
-      z-index: 90;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .history-panel.open { right: 0; }
-    .history-panel h2 { margin-bottom: 16px; }
-    .history-item {
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .history-item:hover { background: var(--surface2); }
-    .history-item .query { font-weight: 600; }
-    .history-item .meta { color: var(--text-muted); font-size: 0.8rem; }
-    .history-panel .close-btn {
-      position: absolute;
-      top: 16px; right: 16px;
-      background: none;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
-    .model-badge {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-    @media (max-width: 600px) {
-      .container { padding: 12px; }
+    .model-name { font-weight: 500; }
+    .model-id { color: var(--text-3); font-size: 11.5px; margin-top: 1px; }
+
+    @media (max-width: 540px) {
+      .app { padding: 16px 14px 60px; }
       .history-panel { width: 280px; right: -280px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Explain Concept</h1>
-      <div class="controls">
-        <button class="icon-btn" id="themeToggle" title="Toggle theme">
-          <svg id="moonIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <svg id="sunIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        </button>
-        <button class="icon-btn" id="historyToggle" title="History"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
-        <button class="icon-btn" id="settingsToggle" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-      </div>
-    </header>
+<div class="app">
 
-    <div class="model-badge" id="modelBadge">Model: meta-llama/llama-3.3-70b-instruct:free</div>
-
-    <div class="form-group">
-      <label for="levelSelect">Experience Level</label>
-      <select id="levelSelect">
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate" selected>Intermediate</option>
-        <option value="Advanced">Advanced</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="conceptInput">Paste code or describe a concept</label>
-      <textarea id="conceptInput" placeholder="Paste a confusing function, unfamiliar syntax, or just describe what you don't understand..."></textarea>
-    </div>
-
-    <button class="btn-primary" id="explainBtn" disabled>Explain</button>
-
-    <div id="resultArea" style="margin-top: 24px;"></div>
-  </div>
-
-  <div class="history-panel" id="historyPanel">
-    <button class="close-btn" id="historyClose">X</button>
-    <h2>History</h2>
-    <div id="historyList"></div>
-  </div>
-
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-      <h2>Settings</h2>
-      <label for="apiKey">OpenRouter API Key</label>
-      <input type="password" id="apiKey" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="sk-or-..." />
-      <label for="modelSelect">Model</label>
-      <input type="text" id="modelSelect" value="meta-llama/llama-3.3-70b-instruct:free" style="width:100%;padding:10px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;" placeholder="e.g. meta-llama/llama-3.3-70b-instruct:free" />
-      <button class="btn-primary" id="discoverModels" style="margin-top:8px;background:var(--surface2);font-size:0.85rem;">Search free models</button>
-      <div id="modelList" style="margin-top:8px;max-height:200px;overflow-y:auto;display:none;"></div>
-      <button class="btn-primary" id="saveSettings" style="margin-top:12px;">Save</button>
+  <div class="top-bar">
+    <div class="wordmark">explain<span>.</span></div>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+        <svg id="moonSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="sunSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="icon-btn" id="historyBtn" title="History" aria-label="History">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
   </div>
 
-  <script>
-const STORAGE_KEYS = {
-  API_KEY: 'explain_api_key',
-  MODEL: 'explain_model',
-  THEME: 'explain_theme',
-  HISTORY: 'explain_history',
-};
+  <div class="input-section">
+    <div class="level-row" id="levelRow">
+      <button class="level-btn" data-level="New to this">New to this</button>
+      <button class="level-btn active" data-level="Some experience">Some experience</button>
+      <button class="level-btn" data-level="Comfortable, just need a refresher">Comfortable</button>
+    </div>
 
-function getSettings() {
-  return {
-    apiKey: localStorage.getItem(STORAGE_KEYS.API_KEY) || '',
-    model: localStorage.getItem(STORAGE_KEYS.MODEL) || 'meta-llama/llama-3.3-70b-instruct:free',
+    <div class="preset-row" id="presetRow">
+      <button class="preset-btn active" data-preset="explain">Explain</button>
+      <button class="preset-btn" data-preset="debug">Debug</button>
+      <button class="preset-btn" data-preset="compare">Compare</button>
+      <button class="preset-btn" data-preset="simplify">Simplify</button>
+      <button class="preset-btn" data-preset="quiz">Quiz me</button>
+    </div>
+
+    <div class="textarea-wrap">
+      <textarea id="conceptInput" placeholder="Paste a confusing function, an error message, or just describe what you don't get…" spellcheck="false"></textarea>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-explain" id="explainBtn" disabled>Explain this</button>
+      <button class="btn-ghost" id="clearBtn">Clear</button>
+    </div>
+    <div class="model-label" id="modelLabel"></div>
+  </div>
+
+  <div class="result-area" id="resultArea"></div>
+  <div class="status-bar" id="statusBar"></div>
+
+</div>
+
+<!-- History panel -->
+<div class="panel-overlay" id="panelOverlay"></div>
+<div class="history-panel" id="historyPanel">
+  <div class="panel-head">
+    <span>History</span>
+    <div>
+      <button class="panel-btn" id="clearHistoryBtn">Clear</button>
+      <button class="panel-close" id="panelClose">×</button>
+    </div>
+  </div>
+  <div class="panel-body" id="historyList"></div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h2>Settings</h2>
+    <div class="field">
+      <label>OPENROUTER API KEY</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-or-…" />
+    </div>
+    <div class="field">
+      <label>MODEL</label>
+      <input type="text" id="modelInput" placeholder="meta-llama/llama-3.3-70b-instruct:free" />
+    </div>
+    <button class="btn-ghost" id="discoverBtn" style="width:100%;margin-top:2px;font-size:13px;">Browse free models</button>
+    <div class="free-models-wrap" id="freeModelsWrap"></div>
+    <div class="modal-actions">
+      <button class="btn-save" id="saveBtn">Save</button>
+      <button class="btn-cancel" id="cancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Status log ─────────────────────────────────────────────────────────────────
+function logStatus(msg) {
+  const el = document.getElementById('statusBar');
+  if (el) el.innerHTML = el.innerHTML + '<br>' + '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  console.log('[Status]', msg);
+}
+
+// ── Storage ──────────────────────────────────────────────────────────────────
+const SK = { KEY: 'ex_key', MODEL: 'ex_model', THEME: 'ex_theme', HIST: 'ex_hist' };
+const get = k => localStorage.getItem(k) || '';
+const set = (k, v) => localStorage.setItem(k, v);
+
+// Migrate old localStorage keys from prior version
+const OLD = { KEY: 'explain_api_key', MODEL: 'explain_model', THEME: 'explain_theme', HIST: 'explain_history' };
+if (!get(SK.KEY) && localStorage.getItem(OLD.KEY)) set(SK.KEY, localStorage.getItem(OLD.KEY));
+if (!get(SK.MODEL) && localStorage.getItem(OLD.MODEL)) set(SK.MODEL, localStorage.getItem(OLD.MODEL));
+if (!get(SK.THEME) && localStorage.getItem(OLD.THEME)) set(SK.THEME, localStorage.getItem(OLD.THEME));
+if (!get(SK.HIST) && localStorage.getItem(OLD.HIST)) set(SK.HIST, localStorage.getItem(OLD.HIST));
+
+logStatus('init: localStorage migrated');
+
+function loadSettings() {
+  const s = {
+    apiKey: get(SK.KEY),
+    model: get(SK.MODEL) || 'meta-llama/llama-3.3-70b-instruct:free',
   };
+  logStatus('loadSettings: key=' + (s.apiKey ? 'present' : 'missing') + ' model=' + s.model);
+  return s;
+}
+function saveSettings(key, model) { set(SK.KEY, key); set(SK.MODEL, model); logStatus('saveSettings: key=' + (key ? 'saved' : 'empty') + ' model=' + model); }
+
+function loadHistory() { try { return JSON.parse(get(SK.HIST) || '[]'); } catch { return []; } }
+function saveHistory(arr) { set(SK.HIST, JSON.stringify(arr.slice(0, 30))); }
+
+// ── Theme ────────────────────────────────────────────────────────────────────
+function applyTheme(t) {
+  logStatus('applyTheme: ' + t);
+  document.documentElement.className = t === 'light' ? 'light' : '';
+  set(SK.THEME, t);
+  const isLight = t === 'light';
+  document.getElementById('moonSvg').style.display = isLight ? 'none' : '';
+  document.getElementById('sunSvg').style.display  = isLight ? '' : 'none';
+  document.getElementById('hljs-dark').disabled    = isLight;
+  document.getElementById('hljs-light').disabled   = !isLight;
+  mermaid.initialize({ theme: isLight ? 'default' : 'dark', securityLevel: 'loose' });
+  rerenderMermaidDiagrams();
 }
 
-function saveSettings(apiKey, model) {
-  localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
-  localStorage.setItem(STORAGE_KEYS.MODEL, model);
+const mermaidSlots = new Set();
+
+applyTheme(get(SK.THEME) || 'dark');
+document.getElementById('themeBtn').addEventListener('click', () => {
+  applyTheme(document.documentElement.className === 'light' ? 'dark' : 'light');
+});
+
+function rerenderMermaidDiagrams() {
+  mermaidSlots.forEach(id => {
+    const slot = document.getElementById(id);
+    if (slot?.dataset.mermaidCode) renderMermaid(id, slot.dataset.mermaidCode);
+  });
 }
 
-function getTheme() {
-  return localStorage.getItem(STORAGE_KEYS.THEME) || 'dark';
+// ── Model label ───────────────────────────────────────────────────────────────
+function refreshLabel() {
+  document.getElementById('modelLabel').textContent = 'Model: ' + loadSettings().model;
+}
+refreshLabel();
+logStatus('init: label refreshed, apiKey=' + (loadSettings().apiKey ? 'present' : 'missing'));
+if (!loadSettings().apiKey) setTimeout(openSettings, 0);
+
+// ── Input / level / presets ───────────────────────────────────────────────────
+let currentLevel = 'Some experience';
+let currentPreset = 'explain';
+const PRESETS = {
+  explain: {
+    label: 'Explain',
+    system: '',
+    wrap: c => c,
+  },
+  debug: {
+    label: 'Debug',
+    system: 'The student is showing you an error message or buggy code. Explain what went wrong, what caused it, and how to fix it. Be specific about the root cause.',
+    wrap: c => `I'm getting this error or bug:\n\n${c}\n\nWhat went wrong and how do I fix it?`,
+  },
+  compare: {
+    label: 'Compare',
+    system: 'The student wants a comparison. Contrast the differences. Cover: what each is, key differences, trade-offs, and when to use which one.',
+    wrap: c => `Compare and contrast:\n\n${c}`,
+  },
+  simplify: {
+    label: 'Simplify',
+    system: 'The student needs a simpler explanation. Use the simplest possible language. Favor short analogies. Minimize jargon. Keep each section brief.',
+    wrap: c => `Explain this very simply:\n\n${c}`,
+  },
+  quiz: {
+    label: 'Quiz me',
+    wrap: c => `Based on this concept, generate practice questions:\n\n${c}`,
+  },
+};
+const conceptInput = document.getElementById('conceptInput');
+const explainBtn   = document.getElementById('explainBtn');
+const clearBtn     = document.getElementById('clearBtn');
+const resultArea   = document.getElementById('resultArea');
+
+document.getElementById('levelRow').addEventListener('click', e => {
+  const btn = e.target.closest('.level-btn');
+  if (!btn) return;
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentLevel = btn.dataset.level;
+});
+
+document.getElementById('presetRow').addEventListener('click', e => {
+  const btn = e.target.closest('.preset-btn');
+  if (!btn) return;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPreset = btn.dataset.preset;
+});
+
+let lastTextareaHeight = 130;
+conceptInput.addEventListener('input', () => {
+  explainBtn.disabled = !conceptInput.value.trim();
+  if (conceptInput.scrollHeight !== lastTextareaHeight) {
+    conceptInput.style.height = 'auto';
+    lastTextareaHeight = Math.min(conceptInput.scrollHeight, 320);
+    conceptInput.style.height = lastTextareaHeight + 'px';
+  }
+});
+
+clearBtn.addEventListener('click', () => {
+  conceptInput.value = '';
+  conceptInput.style.height = '130px';
+  resultArea.innerHTML = '';
+  explainBtn.disabled = true;
+  currentFollowupCtx = null;
+  followupThread = [];
+  mermaidSlots.clear();
+  currentPreset = 'explain';
+  document.querySelectorAll('.preset-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.preset === 'explain');
+  });
+});
+
+// ── Sections config ───────────────────────────────────────────────────────────
+const SECTIONS = [
+  { tag: 'PLAIN', title: 'In plain terms',       icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
+  { tag: 'HOW',   title: 'How it works',          icon: '<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' },
+  { tag: 'WHY',   title: 'When you\'d use it',    icon: '<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="19"/><line x1="9" y1="19" x2="15" y2="19"/>' },
+  { tag: 'CODE',  title: 'Quick example',         icon: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>' },
+  { tag: 'WATCH', title: 'Common trip-ups',       icon: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>' },
+];
+
+// ── System prompt ─────────────────────────────────────────────────────────────
+function buildSystemPrompt(level, preset) {
+  const p = PRESETS[preset || 'explain'];
+  if (preset === 'quiz') {
+    return `You are a patient tutor making practice questions. The student's level: "${level}".
+
+Generate 3-5 practice questions to test understanding of the concept. Mix formats: short answer, code, multiple choice. Do NOT include answers.
+
+After the questions, put "[ANSWERS]" on its own line, then provide concise answers.
+
+Rules:
+- Match difficulty to level.
+- Do NOT use [PLAIN]/[HOW]/[WHY]/[CODE]/[WATCH] markers.
+- Keep it brief and focused on testing understanding.`;
+  }
+  return `You are a patient, friendly tutor. The student's level: "${level}".
+
+${p.system ? p.system + '\n\n' : ''}Explain the concept using EXACTLY these 5 sections, in this order, using these exact markers on their own line:
+
+[PLAIN]
+One clear paragraph. No jargon. Explain like you're talking to a friend. Use "you" and "your".
+
+[HOW]
+The mechanism. What's actually happening under the hood, plainly. 2-4 sentences.
+
+[WHY]
+A real-world reason or analogy that makes it click. When would someone reach for this?
+
+[CODE]
+A short, self-contained, commented code example. Use a fenced code block. If the concept isn't code-related, skip this section entirely (omit the marker).
+
+[WATCH]
+2-3 common mistakes or gotchas, as a short bullet list. Be specific, not generic.
+
+Rules:
+- Write conversationally. Short sentences are fine.
+- Match vocabulary exactly to the level — don't talk down, don't over-explain.
+- Do NOT add any text before [PLAIN] or after the last section.
+- Each section marker must be on its own line.`;
 }
 
-function setTheme(theme) {
-  document.documentElement.className = theme === 'light' ? 'light' : '';
-  localStorage.setItem(STORAGE_KEYS.THEME, theme);
-  const isLight = theme === 'light';
-  document.getElementById('moonIcon').style.display = isLight ? 'none' : '';
-  document.getElementById('sunIcon').style.display = isLight ? '' : 'none';
-  document.getElementById('hljsTheme').disabled = isLight;
-  document.getElementById('hljsThemeLight').disabled = !isLight;
+// ── Parse sections ────────────────────────────────────────────────────────────
+function parseSections(text) {
+  const out = {};
+  const tags = SECTIONS.map(s => s.tag);
+  for (let i = 0; i < tags.length; i++) {
+    const startMarker = `[${tags[i]}]`;
+    const start = text.indexOf(startMarker);
+    if (start === -1) continue;
+    const contentStart = start + startMarker.length;
+    let end = text.length;
+    for (let j = i + 1; j < tags.length; j++) {
+      const nextIdx = text.indexOf(`[${tags[j]}]`, contentStart);
+      if (nextIdx !== -1 && nextIdx < end) { end = nextIdx; break; }
+    }
+    out[tags[i]] = text.slice(contentStart, end).trim();
+  }
+  return out;
 }
 
-const themeToggle = document.getElementById('themeToggle');
-themeToggle.addEventListener('click', () => {
-  const current = getTheme();
-  setTheme(current === 'light' ? 'dark' : 'light');
+// ── Render markdown ───────────────────────────────────────────────────────────
+function renderMd(text) {
+  logStatus('renderMd: parsing markdown...');
+  const html = marked.parse(text, { breaks: true, gfm: true });
+  logStatus('renderMd: markdown parsed, highlighting code blocks');
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  const blocks = wrap.querySelectorAll('pre code');
+  blocks.forEach(block => hljs.highlightElement(block));
+  logStatus('renderMd: highlighted ' + blocks.length + ' blocks');
+  return wrap.innerHTML;
+}
+
+// ── Mermaid diagram prompt ────────────────────────────────────────────────────
+function buildHowMermaidPrompt(concept, howText) {
+  return `You generate Mermaid.js diagram code that visually explains how something works.
+
+Given a concept and its "how it works" explanation, decide:
+1. Would a diagram genuinely help? A diagram helps for: processes, flows, state machines, memory layouts, request/response cycles, tree structures, pipelines. It does NOT help for: abstract ideas, pure definitions.
+2. If yes, produce a single Mermaid diagram. If no, respond with exactly: NO_DIAGRAM
+
+Rules:
+- Output ONLY valid Mermaid syntax (flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, graph, etc.)
+- Pick the BEST diagram type for the concept
+- Keep it simple. Labels max 5 words.
+- Use subgraphs for grouping if helpful
+- Do NOT include markdown fences. Return raw Mermaid only.
+- Use flowchart TD (top-down) or LR (left-right) as default
+
+Concept: ${concept}
+How it works: ${howText}`;
+}
+
+function buildWhyMermaidPrompt(concept, whyText) {
+  return `You generate Mermaid.js diagram code that visually shows when or why to use something.
+
+Given a concept and its "when you'd use it" explanation, decide:
+1. Would a diagram genuinely help? A diagram helps for: decision trees, comparison charts, use-case scenarios, trade-off splits, flowcharts that help decide. It does NOT help for: abstract ideas, pure definitions.
+2. If yes, produce a single Mermaid diagram. If no, respond with exactly: NO_DIAGRAM
+
+Rules:
+- Output ONLY valid Mermaid syntax (flowchart, graph, quadrantChart, etc.)
+- Pick the BEST diagram type for the concept
+- Keep it simple. Labels max 5 words.
+- Use subgraphs for grouping if helpful
+- Do NOT include markdown fences. Return raw Mermaid only.
+- Use flowchart TD or LR as default
+
+Concept: ${concept}
+When you'd use it: ${whyText}`;
+}
+
+// ── Main explain ──────────────────────────────────────────────────────────────
+let currentFollowupCtx = null;
+let abortCtrl = null;
+
+explainBtn.addEventListener('click', runExplain);
+conceptInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) runExplain();
 });
 
-const settingsToggle = document.getElementById('settingsToggle');
-const settingsModal = document.getElementById('settingsModal');
-const saveSettingsBtn = document.getElementById('saveSettings');
-const apiKeyInput = document.getElementById('apiKey');
-const modelSelect = document.getElementById('modelSelect');
-const discoverBtn = document.getElementById('discoverModels');
-const modelListEl = document.getElementById('modelList');
+async function runExplain() {
+  document.getElementById('statusBar').innerHTML = '';
+  logStatus('runExplain: started');
+  const concept = conceptInput.value.trim();
+  if (!concept) return;
 
-settingsToggle.addEventListener('click', () => {
-  const s = getSettings();
-  apiKeyInput.value = s.apiKey;
-  modelSelect.value = s.model;
-  modelListEl.style.display = 'none';
-  settingsModal.classList.add('open');
-});
-
-settingsModal.addEventListener('click', (e) => {
-  if (e.target === settingsModal) settingsModal.classList.remove('open');
-});
-
-saveSettingsBtn.addEventListener('click', () => {
-  saveSettings(apiKeyInput.value.trim(), modelSelect.value);
-  renderModelBadge();
-  settingsModal.classList.remove('open');
-});
-
-discoverBtn.addEventListener('click', async () => {
-  if (!apiKeyInput.value.trim()) {
-    modelListEl.style.display = 'block';
-    modelListEl.innerHTML = '<div style="color:var(--error);font-size:0.85rem;">Enter your API key first.</div>';
+  const { apiKey, model } = loadSettings();
+  if (!apiKey) {
+    logStatus('runExplain: no api key, opening settings');
+    openSettings();
+    showError('Add your OpenRouter API key in Settings first.');
     return;
   }
-  saveSettings(apiKeyInput.value.trim(), modelSelect.value);
-  discoverBtn.disabled = true;
-  discoverBtn.textContent = 'Searching...';
-  modelListEl.style.display = 'block';
-  modelListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Loading...</div>';
+
+  if (abortCtrl) abortCtrl.abort();
+  abortCtrl = new AbortController();
+  const requestTimeout = setTimeout(() => { abortCtrl.abort(); logStatus('runExplain: request timed out after 90s'); }, 90000);
+
+  explainBtn.disabled = true;
+  explainBtn.textContent = 'Thinking…';
+  logStatus('runExplain: showing loading, calling API');
+  resultArea.innerHTML = `
+    <div class="loading-wrap">
+      Working it out…
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>`;
+  currentFollowupCtx = null;
+
   try {
-    const models = await fetchFreeModels();
-    if (!models.length) {
-      modelListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">No free models found.</div>';
-      return;
-    }
-    modelListEl.innerHTML = models.map(m => `
-      <div class="free-model-item" data-model="${escapeHtml(m.id)}" style="padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:pointer;font-size:0.85rem;display:flex;justify-content:space-between;align-items:center;">
-        <span><strong>${escapeHtml(m.name)}</strong><br><span style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(m.id)}</span></span>
-        <span style="color:var(--text-muted);font-size:0.75rem;">${escapeHtml(m.context)} ctx</span>
-      </div>
-    `).join('');
-    modelListEl.querySelectorAll('.free-model-item').forEach(el => {
-      el.addEventListener('click', async () => {
-        const modelId = el.dataset.model;
-        modelSelect.value = modelId;
-        saveSettings(apiKeyInput.value.trim(), modelId);
-        modelListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Testing model... one sec.</div>';
-        try {
-          const res = await explainConcept('what is 2+2', 'Beginner');
-          if (res && res.length > 10) {
-            modelListEl.innerHTML = `<div style="color:var(--success);font-size:0.85rem;">Model works! Saved.</div>`;
-            renderModelBadge();
-          }
-        } catch {
-          modelListEl.innerHTML = `<div style="color:var(--error);font-size:0.85rem;">Model failed. Try another.</div>`;
-          modelSelect.value = getSettings().model;
-        }
-      });
+    const presetInfo = PRESETS[currentPreset];
+    logStatus('callAPI: sending request, model=' + model + ' preset=' + currentPreset);
+    const fullText = await callAPI({
+      apiKey, model,
+      system: buildSystemPrompt(currentLevel, currentPreset),
+      messages: [{ role: 'user', content: presetInfo.wrap(concept) }],
+      signal: abortCtrl.signal,
     });
+    logStatus('callAPI: response received, length=' + fullText.length);
+
+    if (currentPreset === 'quiz') {
+      logStatus('runExplain: rendering quiz');
+      resultArea.innerHTML = `<div class="section-card"><div class="section-head"><span class="section-title">Practice Questions</span></div><div class="section-body">${renderMd(fullText)}</div></div>`;
+      logStatus('runExplain: quiz rendered');
+    } else {
+      const parsed = parseSections(fullText);
+      logStatus('runExplain: parsed ' + Object.keys(parsed).length + ' sections');
+      renderSections(parsed);
+      logStatus('runExplain: sections rendered');
+
+      if (parsed.HOW) {
+        injectDiagramSkeleton('how-section-card', 'diagram-slot-how');
+        generateDiagram(concept, parsed.HOW, apiKey, model, buildHowMermaidPrompt, 'diagram-slot-how');
+      }
+      if (parsed.WHY) {
+        injectDiagramSkeleton('why-section-card', 'diagram-slot-why');
+        generateDiagram(concept, parsed.WHY, apiKey, model, buildWhyMermaidPrompt, 'diagram-slot-why');
+      }
+    }
+
+    renderExportBtn(concept, fullText);
+    logStatus('runExplain: export buttons rendered');
+    renderFollowup(concept, fullText);
+    logStatus('runExplain: follow-up rendered');
+
+    // save history
+    logStatus('runExplain: saving history');
+    const hist = loadHistory();
+    hist.unshift({ q: concept, level: currentLevel, preset: currentPreset, raw: fullText, ts: Date.now() });
+    saveHistory(hist);
+    clearTimeout(requestTimeout);
+    logStatus('runExplain: done');
+
   } catch (err) {
-    modelListEl.innerHTML = `<div style="color:var(--error);font-size:0.85rem;">${escapeHtml(err.message)}</div>`;
+    clearTimeout(requestTimeout);
+    if (err.name === 'AbortError') { logStatus('runExplain: aborted'); showError('Request timed out after 90s. The free model may be slow — try a different model in Settings.'); return; }
+    logStatus('runExplain: error - ' + err.message);
+    showError(friendlyError(err));
   } finally {
-    discoverBtn.disabled = false;
-    discoverBtn.textContent = 'Search free models';
+    explainBtn.disabled = !conceptInput.value.trim();
+    explainBtn.textContent = 'Explain this';
   }
-});
-
-function renderModelBadge() {
-  const { model } = getSettings();
-  const modelLabel = model;
-  document.getElementById('modelBadge').textContent = `Model: ${modelLabel}`;
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+function injectDiagramSkeleton(cardId, slotId) {
+  logStatus('diagram: injecting skeleton for ' + slotId);
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const body = card.querySelector('.section-body');
+  const wrap = document.createElement('div');
+  wrap.className = 'diagram-wrap';
+  wrap.id = slotId;
+  wrap.innerHTML = `<div class="diagram-label">Visual</div><div class="diagram-skeleton"></div>`;
+  body.appendChild(wrap);
 }
 
-async function explainConcept(concept, level, signal) {
-  const { apiKey, model } = getSettings();
-  if (!apiKey) throw new Error('No API key configured. Add one in Settings.');
+function extractMermaid(text) {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('flowchart') || trimmed.startsWith('graph') || 
+      trimmed.startsWith('sequenceDiagram') || trimmed.startsWith('stateDiagram') ||
+      trimmed.startsWith('classDiagram') || trimmed.startsWith('erDiagram') ||
+      trimmed.startsWith('journey') || trimmed.startsWith('gantt') ||
+      trimmed.startsWith('pie') || trimmed.startsWith('quadrantChart') ||
+      trimmed.startsWith('requirementDiagram') || trimmed.startsWith('gitgraph') ||
+      trimmed.startsWith('mindmap') || trimmed.startsWith('timeline')) {
+    return trimmed;
+  }
+  const fullMatch = trimmed.match(/```(?:mermaid)?\s*\n?([\s\S]*?)\s*\n?```/);
+  if (fullMatch) return fullMatch[1].trim();
+  const partialMatch = trimmed.match(/```(?:mermaid)?\s*\n?([\s\S]*?)```/);
+  return partialMatch ? partialMatch[1].trim() : null;
+}
 
-  const sys = `Explain concepts to a ${level} student. Always return exactly 5 sections: Plain English, How It Works, Real-World Analogy, Code Example, Common Mistakes. Be accurate.`;
+function sanitizeMermaid(code) {
+  let s = code;
+  s = s.replace(/:::\w+/g, '');
+  s = s.replace(
+    /([A-Za-z_]\w*)\[([^"'\]]*?[ \(\),\-\/\\][^"'\]]*?)\]/g,
+    '$1["$2"]'
+  );
+  s = s.replace(/-->\s*/g, ' --> ');
+  s = s.replace(/\s*<--/g, '<-- ');
+  s = s.split('\n').map(l => l.trimEnd()).join('\n');
+  return s;
+}
 
-  const body = {
-    model,
-    messages: [
-      { role: 'system', content: sys },
-      { role: 'user', content: `Explain this (${level}):\n\n${concept}` },
-    ],
-    temperature: 0.1,
-    max_tokens: 1200,
-  };
+async function renderMermaid(slotId, mermaidCode) {
+  logStatus('diagram: renderMermaid for ' + slotId);
+  const slot = document.getElementById(slotId);
+  if (!slot) { mermaidSlots.delete(slotId); return false; }
+  try {
+    const { svg } = await mermaid.render(`mermaid-${slotId}`, mermaidCode);
+    slot.innerHTML = `<div class="diagram-label">Visual</div>${svg}`;
+    slot.dataset.mermaidCode = mermaidCode;
+    mermaidSlots.add(slotId);
+    logStatus('diagram: mermaid rendered for ' + slotId);
+    return true;
+  } catch (err) {
+    mermaidSlots.delete(slotId);
+    logStatus('diagram: mermaid render failed - ' + err.message);
+    return false;
+  }
+}
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey.trim()}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://explain-concept-local',
-    },
-    body: JSON.stringify(body),
-    signal,
+async function generateDiagram(concept, text, apiKey, model, promptBuilder, slotId) {
+  try {
+    logStatus('diagram: Mermaid attempt for ' + slotId);
+    const mermaidRaw = await callAPI({
+      apiKey, model,
+      system: promptBuilder(concept, text),
+      messages: [{ role: 'user', content: 'Generate the Mermaid diagram now.' }],
+      maxTokens: 2000,
+    });
+
+    const mermaidCode = extractMermaid(mermaidRaw);
+    if (mermaidCode && mermaidCode !== 'NO_DIAGRAM') {
+      const clean = sanitizeMermaid(mermaidCode);
+      const ok = await renderMermaid(slotId, clean);
+      if (ok) return;
+      logStatus('diagram: Mermaid render failed, showing raw code');
+      const slot = document.getElementById(slotId);
+      if (slot) {
+        slot.innerHTML = `<div class="diagram-label">Visual (raw)</div><pre style="padding:12px;background:var(--surface2);border-radius:8px;overflow:auto;font-size:11px;color:var(--text-2);max-height:300px;">${escHtml(mermaidCode)}</pre>`;
+        slot.dataset.mermaidCode = mermaidCode;
+      }
+      return;
+    } else {
+      logStatus('diagram: Mermaid model declined or empty');
+    }
+  } catch (err) {
+    logStatus('diagram: Mermaid API error - ' + err.message);
+  }
+
+  const slot = document.getElementById(slotId);
+  if (slot) slot.remove();
+  mermaidSlots.delete(slotId);
+}
+
+function renderSections(parsed) {
+  logStatus('renderSections: building section cards');
+  let html = '';
+  for (const s of SECTIONS) {
+    const content = parsed[s.tag];
+    if (!content) continue;
+    const idAttr = s.tag === 'HOW' ? ' id="how-section-card"' : s.tag === 'WHY' ? ' id="why-section-card"' : '';
+    html += `
+      <div class="section-card"${idAttr}>
+        <div class="section-head">
+          <span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${s.icon}</svg></span>
+          <span class="section-title">${s.title}</span>
+        </div>
+        <div class="section-body">${renderMd(content)}</div>
+      </div>`;
+  }
+  resultArea.innerHTML = html;
+  logStatus('renderSections: inserted into DOM');
+}
+
+// ── Follow-up ────────────────────────────────────────────────────────────────
+const CHIPS = [
+  'Can you give a simpler analogy?',
+  'What are common mistakes?',
+  'What should I learn next?',
+  'Show a more complex example.',
+];
+
+let followupThread = [];  // { role, content }
+
+function renderFollowup(originalConcept, originalAnswer) {
+  logStatus('renderFollowup: building follow-up card');
+  followupThread = [];
+  currentFollowupCtx = { originalConcept, originalAnswer };
+
+  const card = document.createElement('div');
+  card.className = 'followup-card';
+  card.innerHTML = `
+    <div class="followup-head">Ask a follow-up</div>
+    <div class="followup-body">
+      <div class="chips">${CHIPS.map(c => `<button class="chip">${c}</button>`).join('')}</div>
+      <div class="fu-row">
+        <input class="fu-input" id="fuInput" placeholder="Ask anything about this…" />
+        <button class="fu-btn" id="fuSend">Ask</button>
+      </div>
+      <div class="fu-thread" id="fuThread"></div>
+    </div>`;
+  resultArea.appendChild(card);
+
+  card.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => askFollowup(chip.textContent));
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    const msg = err.error?.message || res.statusText;
-    if (res.status === 429) throw new Error('Rate limited. Wait a moment and retry.');
-    throw new Error(`API error (${res.status}): ${msg} — check your API key and model selection`);
-  }
-
-  const data = await res.json();
-  return data.choices[0].message.content;
+  document.getElementById('fuSend').addEventListener('click', () => {
+    const val = document.getElementById('fuInput').value.trim();
+    if (val) askFollowup(val);
+  });
+  document.getElementById('fuInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const val = e.target.value.trim();
+      if (val) askFollowup(val);
+    }
+  });
 }
 
-async function streamExplain(concept, level, onChunk, signal) {
-  const { apiKey, model } = getSettings();
-  if (!apiKey) throw new Error('No API key configured. Add one in Settings.');
+async function askFollowup(question) {
+  if (!currentFollowupCtx) return;
+  const { apiKey, model } = loadSettings();
+  const thread  = document.getElementById('fuThread');
+  const fuSend  = document.getElementById('fuSend');
+  const fuInput = document.getElementById('fuInput');
+  if (!thread) return;
 
-  const sys = `Explain concepts to a ${level} student. Always return exactly 5 sections: Plain English, How It Works, Real-World Analogy, Code Example, Common Mistakes. Be accurate.`;
+  fuInput.value = '';
+  fuSend.disabled = true;
 
+  // render question bubble
+  const qBubble = document.createElement('div');
+  qBubble.className = 'fu-bubble question';
+  qBubble.textContent = question;
+  thread.appendChild(qBubble);
+
+  // thinking bubble
+  const aBubble = document.createElement('div');
+  aBubble.className = 'fu-bubble answer thinking';
+  aBubble.textContent = 'Thinking…';
+  thread.appendChild(aBubble);
+  aBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  followupThread.push({ role: 'user', content: question });
+
+  const systemFU = `You are a patient tutor. The student asked about: "${currentFollowupCtx.originalConcept}". Their level: "${currentLevel}". Answer their follow-up clearly and conversationally. Keep it under 3 short paragraphs. Use code blocks only if really helpful.`;
+
+  // Build messages: seed with original exchange, then the thread
+  const messages = [
+    { role: 'user', content: currentFollowupCtx.originalConcept },
+    { role: 'assistant', content: currentFollowupCtx.originalAnswer },
+    ...followupThread,
+  ];
+
+  try {
+    const answer = await callAPI({ apiKey, model, system: systemFU, messages });
+    followupThread.push({ role: 'assistant', content: answer });
+    aBubble.className = 'fu-bubble answer';
+    aBubble.innerHTML = renderMd(answer);
+  } catch (err) {
+    aBubble.className = 'fu-bubble answer';
+    aBubble.style.color = 'var(--error)';
+    aBubble.textContent = friendlyError(err);
+    followupThread.pop();
+  } finally {
+    fuSend.disabled = false;
+    aBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function renderExportBtn(concept, rawText) {
+  logStatus('renderExportBtn: creating export buttons');
+  const existing = document.querySelector('.export-row');
+  if (existing) existing.remove();
+
+  const row = document.createElement('div');
+  row.className = 'export-row';
+  row.innerHTML = `<button class="btn-export show" id="exportMdBtn">⬇ Markdown</button>
+    <button class="btn-export show" id="exportTxtBtn">⬇ Plain text</button>`;
+  resultArea.insertBefore(row, resultArea.firstChild);
+
+  document.getElementById('exportMdBtn').addEventListener('click', () => {
+    const header = `# ${concept}\n\n**Level:** ${currentLevel} | **Preset:** ${PRESETS[currentPreset].label} | **Date:** ${new Date().toLocaleString()}\n\n`;
+    download(`${header}${rawText}`, `${slugify(concept)}.md`, 'text/markdown');
+  });
+  document.getElementById('exportTxtBtn').addEventListener('click', () => {
+    download(`${concept}\n\n${rawText}`, `${slugify(concept)}.txt`, 'text/plain');
+  });
+}
+
+function download(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+function slugify(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'explanation';
+}
+
+// ── API call ─────────────────────────────────────────────────────────────────
+async function callAPI({ apiKey, model, system, messages, signal, maxTokens = 1400 }) {
+  logStatus('callAPI: POST to openrouter.ai model=' + model + ' maxTokens=' + maxTokens);
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey.trim()}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://explain-concept-local',
+      'HTTP-Referer': location.href,
     },
     body: JSON.stringify({
       model,
-      messages: [
-        { role: 'system', content: sys },
-        { role: 'user', content: `Explain this (${level}):\n\n${concept}` },
-      ],
-      temperature: 0.1,
-      max_tokens: 1200,
-      stream: true,
+      messages: [{ role: 'system', content: system }, ...messages],
+      temperature: 0.15,
+      max_tokens: maxTokens,
     }),
     signal,
   });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    const msg = err.error?.message || res.statusText;
-    if (res.status === 429) throw new Error('Rate limited. Wait a moment and retry.');
-    throw new Error(`API error (${res.status}): ${msg} — check your API key and model selection`);
+    const msg = err?.error?.message || res.statusText;
+    logStatus('callAPI: HTTP ' + res.status + ' - ' + msg);
+    if (res.status === 401) throw new Error('Invalid API key. Check Settings.');
+    if (res.status === 429) throw new Error('Rate limited. Wait a moment and try again.');
+    throw new Error(`API error (${res.status}): ${msg}`);
   }
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buf = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += decoder.decode(value, { stream: true });
-    const lines = buf.split('\n');
-    buf = lines.pop() || '';
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue;
-      const data = line.slice(6);
-      if (data === '[DONE]') return;
-      try {
-        const parsed = JSON.parse(data);
-        const content = parsed.choices?.[0]?.delta?.content || '';
-        if (content) onChunk(content);
-      } catch {}
-    }
-  }
-}
-
-async function fetchFreeModels() {
-  const { apiKey } = getSettings();
-  if (!apiKey) throw new Error('Add your API key in Settings first.');
-
-  const res = await fetch('https://openrouter.ai/api/v1/models', {
-    headers: {
-      'Authorization': `Bearer ${apiKey.trim()}`,
-      'HTTP-Referer': 'https://explain-concept-local',
-    },
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || 'Failed to fetch models');
-  }
-
+  logStatus('callAPI: HTTP 200, parsing JSON');
   const data = await res.json();
-  const freeModels = (data.data || []).filter(m =>
-    m.id.endsWith(':free') || m.pricing?.prompt === 0
-  );
-
-  return freeModels.map(m => ({
-    id: m.id,
-    name: m.name || m.id,
-    context: m.context_length || '?',
-  }));
+  logStatus('callAPI: JSON parsed, extracting content');
+  const content = data.choices?.[0]?.message?.content;
+  logStatus('callAPI: content=' + (content ? content.length + ' chars' : 'null'));
+  if (!content) throw new Error(`API returned an empty response. The model "${model}" may be unavailable.`);
+  return content;
 }
 
-function renderResult(markdown, query, level) {
-  const html = marked.parse(markdown, { breaks: true });
-  resultArea.innerHTML = `
-    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">
-      Level: ${level} · ${new Date().toLocaleTimeString()}
-    </div>
-    <div class="result-section">${html}</div>
-  `;
-  resultArea.querySelectorAll('pre code').forEach(block => {
-    hljs.highlightElement(block);
-  });
+function friendlyError(err) {
+  if (err instanceof TypeError) return 'Could not reach OpenRouter — check your internet connection.';
+  return err.message || 'Something went wrong.';
 }
 
-const MAX_HISTORY = 20;
-
-function getHistory() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
-  } catch { return []; }
+function showError(msg) {
+  logStatus('showError: ' + msg);
+  resultArea.innerHTML = `<div class="error-box">${escHtml(msg)}</div>`;
 }
 
-function addToHistory(query, level, markdown) {
-  const history = getHistory();
-  history.unshift({ query, level, markdown, timestamp: Date.now() });
-  if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-  localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
-  renderHistory();
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function renderHistory() {
-  const list = document.getElementById('historyList');
-  const history = getHistory();
-  if (!history.length) {
-    list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">No explanations yet.</div>';
-    return;
-  }
-  list.innerHTML = history.map((item, i) => `
-    <div class="history-item" data-index="${i}">
-      <div class="query">${escapeHtml(truncate(item.query, 60))}</div>
-      <div class="meta">${item.level} · ${new Date(item.timestamp).toLocaleDateString()}</div>
-    </div>
-  `).join('');
+// ── History ───────────────────────────────────────────────────────────────────
+const historyBtn   = document.getElementById('historyBtn');
+const historyPanel = document.getElementById('historyPanel');
+const panelOverlay = document.getElementById('panelOverlay');
+const panelClose   = document.getElementById('panelClose');
+const historyList  = document.getElementById('historyList');
 
-  list.querySelectorAll('.history-item').forEach(el => {
+function openHistory() {
+  const hist = loadHistory();
+  historyList.innerHTML = hist.length
+    ? hist.map((h, i) => `
+        <div class="h-item" data-i="${i}">
+          <div class="h-item-q">${escHtml(h.q.slice(0, 80))}${h.q.length > 80 ? '…' : ''}</div>
+          <div class="h-item-meta">${h.level} · ${PRESETS[h.preset || 'explain'].label} · ${new Date(h.ts).toLocaleDateString()}</div>
+        </div>`).join('')
+    : '<div class="h-empty">No explanations yet.</div>';
+
+  historyList.querySelectorAll('.h-item').forEach(el => {
     el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.index);
-      const item = getHistory()[idx];
-      if (item) {
-        renderResult(item.markdown, item.query, item.level);
+      const h = loadHistory()[+el.dataset.i];
+      if (!h) return;
+      conceptInput.value = h.q;
+      explainBtn.disabled = false;
+      currentLevel = h.level;
+      document.querySelectorAll('.level-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.level === h.level);
+      });
+      currentPreset = h.preset || 'explain';
+      document.querySelectorAll('.preset-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.preset === (h.preset || 'explain'));
+      });
+      if (currentPreset === 'quiz') {
+        renderSections({});
+        resultArea.innerHTML = `<div class="section-card"><div class="section-head"><span class="section-title">Practice Questions</span></div><div class="section-body">${renderMd(h.raw)}</div></div>`;
+      } else {
+        const parsed = parseSections(h.raw);
+        renderSections(parsed);
       }
+      renderFollowup(h.q, h.raw);
+      closeHistory();
     });
   });
+
+  historyPanel.classList.add('open');
+  panelOverlay.classList.add('open');
 }
 
-function truncate(str, n) {
-  return str.length > n ? str.slice(0, n) + '...' : str;
+function closeHistory() {
+  historyPanel.classList.remove('open');
+  panelOverlay.classList.remove('open');
 }
 
-const explainBtn = document.getElementById('explainBtn');
-const conceptInput = document.getElementById('conceptInput');
-const levelSelect = document.getElementById('levelSelect');
-const resultArea = document.getElementById('resultArea');
+function clearHistory() {
+  saveHistory([]);
+  historyList.innerHTML = '<div class="h-empty">No explanations yet.</div>';
+}
 
-conceptInput.addEventListener('input', () => {
-  explainBtn.disabled = conceptInput.value.trim().length === 0;
+historyBtn.addEventListener('click', openHistory);
+document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+panelClose.addEventListener('click', closeHistory);
+panelOverlay.addEventListener('click', closeHistory);
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+const settingsModal = document.getElementById('settingsModal');
+const apiKeyInput   = document.getElementById('apiKeyInput');
+const modelInput    = document.getElementById('modelInput');
+const freeModels    = document.getElementById('freeModelsWrap');
+
+function openSettings() {
+  const s = loadSettings();
+  apiKeyInput.value = s.apiKey;
+  modelInput.value  = s.model;
+  freeModels.style.display = 'none';
+  settingsModal.classList.add('open');
+}
+
+document.getElementById('settingsBtn').addEventListener('click', openSettings);
+document.getElementById('cancelBtn').addEventListener('click', () => settingsModal.classList.remove('open'));
+settingsModal.addEventListener('click', e => { if (e.target === settingsModal) settingsModal.classList.remove('open'); });
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  saveSettings(apiKeyInput.value.trim(), modelInput.value.trim() || 'meta-llama/llama-3.3-70b-instruct:free');
+  refreshLabel();
+  settingsModal.classList.remove('open');
 });
 
-conceptInput.addEventListener('input', () => {
-  conceptInput.style.height = 'auto';
-  conceptInput.style.height = conceptInput.scrollHeight + 'px';
-});
-conceptInput.style.height = conceptInput.scrollHeight + 'px';
-
-let abortController;
-
-explainBtn.addEventListener('click', async () => {
-  const concept = conceptInput.value.trim();
-  if (!concept) return;
-
-  const level = levelSelect.value;
-  explainBtn.disabled = true;
-  explainBtn.textContent = 'Thinking...';
-  resultArea.innerHTML = '<div class="loading">Explaining...</div>';
-
-  abortController = new AbortController();
-  const timeout = setTimeout(() => abortController.abort(), 50000);
-
+document.getElementById('discoverBtn').addEventListener('click', async () => {
+  const key = apiKeyInput.value.trim();
+  if (!key) { freeModels.style.display = 'block'; freeModels.innerHTML = '<p style="font-size:12.5px;color:var(--error)">Enter your API key first.</p>'; return; }
+  freeModels.style.display = 'block';
+  freeModels.innerHTML = '<p style="font-size:12.5px;color:var(--text-3)">Loading…</p>';
   try {
-    let fullText = '';
-    const container = document.createElement('div');
-    container.className = 'result-section';
-    container.style.whiteSpace = 'pre-wrap';
-    resultArea.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Level: ${level}</div>`;
-    resultArea.appendChild(container);
-
-    await streamExplain(concept, level, chunk => {
-      fullText += chunk;
-      container.textContent = fullText;
-    }, abortController.signal);
-
-    renderResult(fullText, concept, level);
-    addToHistory(concept, level, fullText);
-  } catch (err) {
-    console.error('Explain error:', err);
-    let msg;
-    if (err.name === 'AbortError') {
-      msg = 'Timed out (50s). The free model may be slow — use Search free models to find a faster one.';
-    } else if (err instanceof TypeError) {
-      msg = `Request failed — check your internet connection and that the model ID is valid. (${err.message})`;
-    } else {
-      msg = err.message;
-    }
-    resultArea.innerHTML = `<div class="error-box">${escapeHtml(msg)}</div>`;
-    if (err.message && err.message.includes('No API key')) {
-      settingsModal.classList.add('open');
-    }
-  } finally {
-    clearTimeout(timeout);
-    explainBtn.disabled = false;
-    explainBtn.textContent = 'Explain';
+    const res = await fetch('https://openrouter.ai/api/v1/models', {
+      headers: { 'Authorization': `Bearer ${key}`, 'HTTP-Referer': location.href }
+    });
+    if (!res.ok) throw new Error('Failed to fetch models');
+    const { data } = await res.json();
+    const free = (data || []).filter(m => m.id.endsWith(':free') || m.pricing?.prompt === 0)
+      .map(m => ({ id: m.id, name: m.name || m.id, ctx: m.context_length || '?' }));
+    if (!free.length) { freeModels.innerHTML = '<p style="font-size:12.5px;color:var(--text-3)">No free models found.</p>'; return; }
+    freeModels.innerHTML = free.map(m => `
+      <div class="free-model-item" data-id="${escHtml(m.id)}">
+        <div><div class="model-name">${escHtml(m.name)}</div><div class="model-id">${escHtml(m.id)}</div></div>
+        <span style="font-size:11px;color:var(--text-3)">${m.ctx} ctx</span>
+      </div>`).join('');
+    freeModels.querySelectorAll('.free-model-item').forEach(el => {
+      el.addEventListener('click', () => {
+        modelInput.value = el.dataset.id;
+        freeModels.querySelectorAll('.free-model-item').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+      });
+    });
+  } catch (e) {
+    freeModels.innerHTML = `<p style="font-size:12.5px;color:var(--error)">${escHtml(e.message)}</p>`;
   }
 });
-
-const historyToggle = document.getElementById('historyToggle');
-const historyPanel = document.getElementById('historyPanel');
-const historyClose = document.getElementById('historyClose');
-
-historyToggle.addEventListener('click', () => {
-  renderHistory();
-  historyPanel.classList.toggle('open');
-});
-
-historyClose.addEventListener('click', () => historyPanel.classList.remove('open'));
-
-setTheme(getTheme());
-renderHistory();
-renderModelBadge();
-  </script>
+</script>
 </body>
 </html>
